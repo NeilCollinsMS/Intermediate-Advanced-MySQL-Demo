@@ -13,3 +13,56 @@ SELECT * FROM performance;
 # Breaking this table down into multiple tables would make it more complicated than it needs to begin
 # If I were working with a more complex data set, I would generate multiple tables, generate primary keys, and link them with foreign keys
 # However, that would just make the data dirtier to work with needlessly. I will attempt to find a proper data set to demonstrate joins at a later date.
+
+ALTER TABLE performance RENAME COLUMN `race/ethnicity` TO race_eth; 
+ALTER TABLE performance RENAME COLUMN `parental level of education` TO parent_edu; 
+ALTER TABLE performance RENAME COLUMN `test preparation course` TO test_prep;
+ALTER TABLE performance RENAME COLUMN `math score` TO math_score;
+ALTER TABLE performance RENAME COLUMN `reading score` TO reading_score; 
+ALTER TABLE performance RENAME COLUMN `writing score` TO writing_score;   
+
+# Common Table Expression (CTE) Query (Queries) - What demographics scored the highest?
+# Intentionally long-winded, keep going!
+
+WITH HighScorers(gender, race_eth, parent_edu, lunch) AS
+(
+	SELECT gender, race_eth, parent_edu, lunch
+    FROM performance
+    WHERE (math_score + reading_score + writing_score) > 250
+)
+SELECT gender, count(gender) AS 'count' 
+FROM HighScorers 
+GROUP BY gender;
+
+WITH HighScorers(gender, race_eth, parent_edu, lunch) AS
+(
+	SELECT gender, race_eth, parent_edu, lunch
+    FROM performance
+    WHERE (math_score + reading_score + writing_score) > 250
+)
+SELECT race_eth, count(race_eth) AS 'count' 
+FROM HighScorers 
+GROUP BY race_eth;
+
+WITH HighScorers(gender, race_eth, parent_edu, lunch) AS
+(
+	SELECT gender, race_eth, parent_edu, lunch
+    FROM performance
+    WHERE (math_score + reading_score + writing_score) > 250
+)
+SELECT parent_edu, count(parent_edu) AS 'count' 
+FROM HighScorers 
+GROUP BY parent_edu
+ORDER BY count(parent_edu) DESC;
+
+WITH HighScorers(gender, race_eth, parent_edu, lunch) AS
+(
+	SELECT gender, race_eth, parent_edu, lunch
+    FROM performance
+    WHERE (math_score + reading_score + writing_score) > 250
+)
+SELECT lunch, count(lunch) AS 'count' 
+FROM HighScorers 
+GROUP BY lunch;
+
+# This is a long winded approach, let's answer the same question with a Stored Procedure!
