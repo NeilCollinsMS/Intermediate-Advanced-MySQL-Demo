@@ -1,0 +1,15 @@
+# Neil Collins MySQL Database Demo
+
+CREATE SCHEMA IF NOT EXISTS studperformance;
+
+USE studperformance;
+
+# Data was loaded from CSV using Table Data Import Wizard, file name: studentsperformance.csv
+
+RENAME TABLE studentsperformance TO performance;
+
+SELECT * FROM performance;
+
+# Breaking this table down into multiple tables would make it more complicated than it needs to begin
+# If I were working with a more complex data set, I would generate multiple tables, generate primary keys, and link them with foreign keys
+# However, that would just make the data dirtier to work with needlessly. I will attempt to find a proper data set to demonstrate joins at a later date.
