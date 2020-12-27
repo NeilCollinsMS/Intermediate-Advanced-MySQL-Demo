@@ -22,7 +22,6 @@ ALTER TABLE performance RENAME COLUMN `reading score` TO reading_score;
 ALTER TABLE performance RENAME COLUMN `writing score` TO writing_score;   
 
 # Common Table Expression (CTE) Query (Queries) - What demographics scored the highest?
-# Intentionally long-winded, keep going!
 
 WITH HighScorers(gender, race_eth, parent_edu, lunch) AS
 (
@@ -65,4 +64,33 @@ SELECT lunch, count(lunch) AS 'count'
 FROM HighScorers 
 GROUP BY lunch;
 
-# This is a long winded approach, let's answer the same question with a Stored Procedure!
+# Procedure: Categorize students by score tiers
+
+delimiter //
+
+CREATE PROCEDURE ScoreTier(INOUT math INT(3), INOUT reading INT(3), INOUT writing INT(3), OUT tier VARCHAR(15))
+BEGIN
+	SET math = @math;
+    
+    SET reading = @reading;
+    
+    SET writing = @writing;
+    
+    IF((math + reading + writing) = 300) THEN
+    SET tier = 'Perfect Score';
+    ELSEIF((math + reading + writing) >= 250) THEN
+    SET tier = 'High Score';
+    ELSEIF((math + reading + writing) >= 175) THEN
+    SET tier = 'Passing Score';
+    ELSEIF((math + reading + writing) < 175) THEN
+    SET tier = 'Failing Score';
+    END IF;
+    
+END//
+delimiter ;
+
+SET @math = 80;
+SET @reading = 80;
+SET @writing = 90;
+CALL ScoreTier(@math,@reading,@writing,@tier);
+SELECT @math,@reading,@writing,@tier;
