@@ -94,3 +94,85 @@ SET @reading = 80;
 SET @writing = 90;
 CALL ScoreTier(@math,@reading,@writing,@tier);
 SELECT @math,@reading,@writing,@tier;
+
+# Stored Function: Calculate Total Score
+
+DROP FUNCTION IF EXISTS ScoreCalc 
+
+delimiter //
+CREATE FUNCTION ScoreCalc(math_score INT(3), reading_score INT(3), writing_score INT(3))
+RETURNS INT(3)
+DETERMINISTIC
+BEGIN
+	DECLARE Total_Score INT(3);
+    SET Total_Score = (math_score + reading_score + writing_score);
+RETURN(Total_Score);
+END//
+delimiter ;
+
+SELECT gender, race_eth, parent_edu, lunch, test_prep, math_score, reading_score, writing_score, ScoreCalc(math_score, reading_score, writing_score) AS 'Total Score'
+FROM performance
+WHERE ScoreCalc(math_score, reading_score, writing_score) >= 250
+ORDER BY ScoreCalc(math_score, reading_score, writing_score) DESC;
+
+# Stored Trigger: Maintaining data entry integrity of inserted test scores. This version just adjusts <0 to 0 and >100 to 100. 
+
+# The second version will reject invalid inserts and return a message.
+
+# Math Trigger 1
+
+DROP TRIGGER IF EXISTS Math_Check;
+
+delimiter //
+
+CREATE TRIGGER Math_Check
+BEFORE INSERT ON performance FOR EACH ROW
+BEGIN
+	IF(NEW.math_score < 0) THEN SET NEW.math_score = 0;
+    ELSEIF(NEW.math_score > 100) THEN SET NEW.math_score = 100;
+	END IF;
+END //
+
+delimiter ;
+
+# Reading Trigger 1
+
+DROP TRIGGER IF EXISTS Reading_Check;
+
+delimiter //
+
+CREATE TRIGGER Reading_Check
+BEFORE INSERT ON performance FOR EACH ROW
+BEGIN
+	IF(NEW.reading_score < 0) THEN SET NEW.reading_score = 0;
+    ELSEIF(NEW.reading_score > 100) THEN SET NEW.reading_score = 100;
+	END IF;
+END //
+
+delimiter ;
+
+# Writing trigger 1
+
+DROP TRIGGER IF EXISTS Writing_Check;
+
+delimiter //
+
+CREATE TRIGGER Writing_Check
+BEFORE INSERT ON performance FOR EACH ROW
+BEGIN
+	IF(NEW.writing_score < 0) THEN SET NEW.writing_score = 0;
+    ELSEIF(NEW.writing_score > 100) THEN SET NEW.writing_score = 100;
+	END IF;
+END //
+
+delimiter ;
+
+# Test
+
+INSERT INTO performance(test_prep,math_score,reading_score,writing_score) VALUES('TEST SAMPLE',-4,112,33);
+
+SET SQL_SAFE_UPDATES = 0; # ONLY USE THIS COMMAND IF YOU COMPLETELY UNDERSTAND WHAT YOUR QUERY IS DOING.
+
+DELETE FROM performance WHERE test_prep = 'TEST SAMPLE';
+
+# Now, a version of these triggers that instead denies the update and provides a warning message. 
