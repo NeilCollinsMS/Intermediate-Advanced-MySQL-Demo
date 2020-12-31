@@ -176,3 +176,79 @@ SET SQL_SAFE_UPDATES = 0; # ONLY USE THIS COMMAND IF YOU COMPLETELY UNDERSTAND W
 DELETE FROM performance WHERE test_prep = 'TEST SAMPLE';
 
 # Now, a version of these triggers that instead denies the update and provides a warning message. 
+
+##############################
+
+DROP TRIGGER IF EXISTS Math_Check;
+DROP TRIGGER IF EXISTS Reading_Check;
+DROP TRIGGER IF EXISTS Writing_Check;
+
+# Math Trigger 2 (ALTERNATE)
+
+DROP TRIGGER IF EXISTS Math_Check2;
+
+delimiter //
+
+CREATE TRIGGER Math_Check2
+BEFORE INSERT ON performance FOR EACH ROW
+BEGIN
+	IF(NEW.math_score < 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID MATH INPUT';
+    ELSEIF(NEW.math_score > 100) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID MATH INPUT';
+	END IF;
+END //
+
+delimiter ;
+
+# Reading Trigger 1
+
+DROP TRIGGER IF EXISTS Reading_Check2;
+
+delimiter //
+
+CREATE TRIGGER Reading_Check2
+BEFORE INSERT ON performance FOR EACH ROW
+BEGIN
+	IF(NEW.reading_score < 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID READING INPUT';
+    ELSEIF(NEW.reading_score > 100) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID READING INPUT';
+	END IF;
+END //
+
+delimiter ;
+
+# Writing trigger 1
+
+DROP TRIGGER IF EXISTS Writing_Check2;
+
+delimiter //
+
+CREATE TRIGGER Writing_Check2
+BEFORE INSERT ON performance FOR EACH ROW
+BEGIN
+	IF(NEW.writing_score < 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID WRITING INPUT';
+    ELSEIF(NEW.writing_score > 100) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID WRITING INPUT';
+	END IF;
+END //
+
+delimiter ;
+
+# Test
+
+INSERT INTO performance(test_prep,math_score,reading_score,writing_score) VALUES('TEST SAMPLE',-4,112,33);
+
+INSERT INTO performance(test_prep,math_score,reading_score,writing_score) VALUES('TEST SAMPLE',4,112,33);
+
+INSERT INTO performance(test_prep,math_score,reading_score,writing_score) VALUES('TEST SAMPLE',4,112,-33);
+
+INSERT INTO performance(test_prep,math_score,reading_score,writing_score) VALUES('TEST SAMPLE CHARACTER CHARACTER CHARACTER',4,12,33);
+
+SET SQL_SAFE_UPDATES = 0; # ONLY USE THIS COMMAND IF YOU COMPLETELY UNDERSTAND WHAT YOUR QUERY IS DOING.
+
+DELETE FROM performance WHERE test_prep = 'TEST SAMPLE';
+
+DELETE FROM performance WHERE test_prep = 'TEST SAMPLE CHARACTER CHARACTER CHARACTER';
+
+##############################
+
+SELECT DATA_TYPE 
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_schema = 'studperformance' AND table_name = 'performance';
