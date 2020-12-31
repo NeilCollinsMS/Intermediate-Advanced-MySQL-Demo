@@ -151,7 +151,7 @@ END //
 
 delimiter ;
 
-# Writing trigger 1
+# Writing Trigger 1
 
 DROP TRIGGER IF EXISTS Writing_Check;
 
@@ -199,7 +199,7 @@ END //
 
 delimiter ;
 
-# Reading Trigger 1
+# Reading Trigger 2 (ALTERNATE)
 
 DROP TRIGGER IF EXISTS Reading_Check2;
 
@@ -215,7 +215,7 @@ END //
 
 delimiter ;
 
-# Writing trigger 1
+# Writing Trigger 2 (ALTERNATE)
 
 DROP TRIGGER IF EXISTS Writing_Check2;
 
