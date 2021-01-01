@@ -252,3 +252,12 @@ DELETE FROM performance WHERE test_prep = 'TEST SAMPLE CHARACTER CHARACTER CHARA
 SELECT DATA_TYPE 
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE table_schema = 'studperformance' AND table_name = 'performance';
+
+##############################
+
+# Window function to rank student scores, partitioned by gender to get a rank set for each gender
+
+SELECT gender, race_eth, parent_edu, lunch, test_prep, math_score, reading_score, writing_score, ScoreCalc(math_score, reading_score, writing_score) AS 'Total Score',
+RANK() OVER(PARTITION BY gender ORDER BY ScoreCalc(math_score, reading_score, writing_score) DESC) AS 'Rank'
+FROM performance;
+
