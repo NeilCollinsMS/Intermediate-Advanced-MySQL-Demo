@@ -255,9 +255,16 @@ WHERE table_schema = 'studperformance' AND table_name = 'performance';
 
 ##############################
 
-# Window function to rank student scores, partitioned by gender to get a rank set for each gender
+# Window function to rank student scores, partitioned by gender to get a rank set for each gender - SKIPS RANKS AFTER A TIE
 
 SELECT gender, race_eth, parent_edu, lunch, test_prep, math_score, reading_score, writing_score, ScoreCalc(math_score, reading_score, writing_score) AS 'Total Score',
 RANK() OVER(PARTITION BY gender ORDER BY ScoreCalc(math_score, reading_score, writing_score) DESC) AS 'Rank'
 FROM performance;
 
+############################## 
+
+# Window function to rank student scores, partitioned by gender to get a rank set for each gender  - DOES NOT SKIP RANKS
+
+SELECT gender, race_eth, parent_edu, lunch, test_prep, math_score, reading_score, writing_score, ScoreCalc(math_score, reading_score, writing_score) AS 'Total Score',
+DENSE_RANK() OVER(PARTITION BY gender ORDER BY ScoreCalc(math_score, reading_score, writing_score) DESC) AS 'Rank'
+FROM performance;
