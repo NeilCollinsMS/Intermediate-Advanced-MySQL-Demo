@@ -268,3 +268,25 @@ FROM performance;
 SELECT gender, race_eth, parent_edu, lunch, test_prep, math_score, reading_score, writing_score, ScoreCalc(math_score, reading_score, writing_score) AS 'Total Score',
 DENSE_RANK() OVER(PARTITION BY gender ORDER BY ScoreCalc(math_score, reading_score, writing_score) DESC) AS 'Rank'
 FROM performance;
+
+##############################
+
+# Same Window function before utilizing a row number; could potentially be a unique identifier though we'd usually use an auto_increment for that
+
+SELECT gender, race_eth, parent_edu, lunch, test_prep, math_score, reading_score, writing_score, ScoreCalc(math_score, reading_score, writing_score) AS 'Total Score',
+ROW_NUMBER() OVER(PARTITION BY gender ORDER BY ScoreCalc(math_score, reading_score, writing_score) DESC) AS 'Row Number'
+FROM performance;
+
+##############################
+
+# Basic subquery that pulls the demographics and values of the top 10 scoring students, regardless of gender
+# I personally prefer using CTEs or Window Functions when Subqueries get more complicated, but I will generate some more complicated Subquery demos
+
+SELECT gender, race_eth, parent_edu, lunch, test_prep, math_score, reading_score, writing_score, ScoreCalc(math_score, reading_score, writing_score) AS 'Total Score'
+FROM (
+SELECT *
+FROM performance
+ORDER BY ScoreCalc(math_score, reading_score, writing_score) DESC
+LIMIT 10) Subtable
+
+##############################
